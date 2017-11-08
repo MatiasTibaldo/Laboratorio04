@@ -1,5 +1,7 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao;
 
+import org.json.JSONException;
+
 import java.util.List;
 
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.Estado;
@@ -17,7 +19,7 @@ public interface ReclamoDao {
     public Estado getEstadoById(Integer id);
     public TipoReclamo getTipoReclamoById(Integer id);
 
-    public void crear(Reclamo r);
+    public void crear(Reclamo r) throws JSONException;
     public void actualizar(Reclamo r);
     public void borrar(Reclamo r);
     }

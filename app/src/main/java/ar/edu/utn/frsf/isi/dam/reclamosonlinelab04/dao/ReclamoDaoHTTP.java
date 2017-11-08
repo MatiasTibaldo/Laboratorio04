@@ -1,5 +1,7 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,10 +12,6 @@ import java.util.List;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.Estado;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.Reclamo;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.TipoReclamo;
-
-/**
- * Created by mdominguez on 26/10/17.
- */
 
 public class ReclamoDaoHTTP implements ReclamoDao {
 
@@ -38,6 +36,7 @@ public class ReclamoDaoHTTP implements ReclamoDao {
     public List<Estado> estados() {
         if(tiposEstados!=null && tiposEstados.size()>0) return this.tiposEstados;
         else{
+            tiposEstados = new ArrayList<>();
             String estadosJSON = cliente.getAll("estado");
             try {
                 JSONArray arr = new JSONArray(estadosJSON);
@@ -56,8 +55,9 @@ public class ReclamoDaoHTTP implements ReclamoDao {
     public List<TipoReclamo> tiposReclamo() {
         if(tiposReclamos!=null && tiposReclamos.size()>0) return this.tiposReclamos;
         else{
-            String estadosJSON = cliente.getAll("tipo");
+            tiposReclamos = new ArrayList<>();
             try {
+                String estadosJSON = cliente.getAll("tipo");
                 JSONArray arr = new JSONArray(estadosJSON);
                 for(int i=0;i<arr.length();i++){
                     JSONObject unaFila = arr.getJSONObject(i);
@@ -83,6 +83,9 @@ public class ReclamoDaoHTTP implements ReclamoDao {
                 recTmp.setTitulo(unaFila.getString("titulo"));
                 recTmp.setTipo(this.getTipoReclamoById(unaFila.getInt("tipoId")));
                 recTmp.setEstado(this.getEstadoById(unaFila.getInt("estadoId")));
+                if(unaFila.has("lan") && unaFila.has("lon")){
+                    recTmp.setLugar(new LatLng(unaFila.getInt("lat"), unaFila.getInt("lon")));
+                }
                 listaReclamos.add(recTmp);
             }
         } catch (JSONException e) {
@@ -130,7 +133,17 @@ public class ReclamoDaoHTTP implements ReclamoDao {
     }
 
     @Override
-    public void crear(Reclamo r) {
+    public void crear(Reclamo r) throws JSONException {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", r.getId());
+        jsonObject.put("titulo", r.getTitulo());
+        jsonObject.put("detalle", r.getDetalle());
+        jsonObject.put("fecha", r.getFecha());
+        jsonObject.put("tipo", r.getTipo());
+        jsonObject.put("estado", r.getEstado());
+        new MyGenericHTTPClient(server).put(cliente,jsonObject);
+
 
     }
 

@@ -1,18 +1,24 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.Date;
 
 /**
  * Created by mdominguez on 26/10/17.
  */
 
-public class Reclamo {
+public class Reclamo{
     private Integer id;
     private String titulo;
     private String detalle;
     private Date fecha;
     private TipoReclamo tipo;
+    private LatLng lugar;
 
     private Estado estado;
 
@@ -79,5 +85,13 @@ public class Reclamo {
         this.estado = estado;
     }
 
+
+    public LatLng getLugar() {
+        return lugar;
+    }
+
+    public void setLugar(LatLng lugar) {
+        this.lugar = lugar;
+    }
 
 }
