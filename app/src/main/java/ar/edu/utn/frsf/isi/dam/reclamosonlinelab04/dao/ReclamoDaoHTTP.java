@@ -136,14 +136,16 @@ public class ReclamoDaoHTTP implements ReclamoDao {
     public void crear(Reclamo r) throws JSONException {
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", r.getId());
+        jsonObject.put("id", 16);
         jsonObject.put("titulo", r.getTitulo());
         jsonObject.put("detalle", r.getDetalle());
-        jsonObject.put("fecha", r.getFecha());
-        jsonObject.put("tipo", r.getTipo());
-        jsonObject.put("estado", r.getEstado());
-        new MyGenericHTTPClient(server).put(cliente,jsonObject);
+        jsonObject.put("fecha", "");
+        jsonObject.put("tipoId", 8);
+        jsonObject.put("estadoId", 5);
 
+        cliente.post("reclamo", jsonObject);
+
+        System.out.print(jsonObject.toString());
 
     }
 

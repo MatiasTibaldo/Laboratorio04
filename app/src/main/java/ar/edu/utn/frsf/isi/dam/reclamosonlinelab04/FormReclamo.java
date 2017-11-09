@@ -17,6 +17,8 @@ import android.widget.Spinner;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +107,11 @@ public class FormReclamo extends AppCompatActivity {
                 rec.setDetalle(etDetalle.getText().toString());
                 rec.setTipo((TipoReclamo)spTipoReclamo.getItemAtPosition(spTipoReclamo.getSelectedItemPosition()));
 
-                daoReclamo.crear(rec);
+                try {
+                    daoReclamo.crear(rec);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 Intent i = new Intent();
                 setResult(Activity.RESULT_OK, i);
                 finish();

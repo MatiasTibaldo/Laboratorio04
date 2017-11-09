@@ -52,7 +52,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float zoon =10;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,zoon));
 
-        //actualizarMapa();
+        actualizarMapa();
 
     }
 

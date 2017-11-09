@@ -1,14 +1,19 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao;
 
+import android.os.AsyncTask;
+import android.os.StrictMode;
 import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -18,7 +23,7 @@ import java.net.URLEncoder;
  * Created by mdominguez on 26/10/17.
  */
 
-public class MyGenericHTTPClient {
+public class MyGenericHTTPClient{
 
     private String serverAddress;
 
@@ -26,12 +31,14 @@ public class MyGenericHTTPClient {
         this.serverAddress=address;
     }
 
-    public String post(String recurso, String jsonDataObject) {
-        StringBuilder sb = new StringBuilder();
+    public void post(String recurso, JSONObject jsonDataObject) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         HttpURLConnection urlConnection = null;
-        DataOutputStream printout =null;
+        DataOutputStream printout=null;
         try {
+
             URL url = new URL(this.serverAddress+"/"+recurso);
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setDoOutput(true);
@@ -39,43 +46,23 @@ public class MyGenericHTTPClient {
             urlConnection.setRequestProperty("Content-Type","application/json");
             urlConnection.setDoOutput(true);
             urlConnection.setRequestMethod("POST");
-            urlConnection.setUseCaches(false);
             printout = new DataOutputStream(urlConnection.getOutputStream());
+
             Log.d("TEST-ARR",jsonDataObject.toString());
             Log.d("TEST-ARR", URLEncoder.encode(jsonDataObject.toString(),"UTF-8"));
-            String str = jsonDataObject.toString();
-            byte[] jsonData=str.getBytes("UTF-8");
-            printout.write(jsonData);
-//          printout.writeBytes(URLEncoder.encode(pedidoJSON.toString(),"UTF-8"));
+            printout.writeBytes(URLEncoder.encode(jsonDataObject.toString(),"UTF-8"));
             printout.flush();
-
-            // leer las respuestas
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            InputStreamReader isw = new InputStreamReader(in);
-            int data = isw.read();
-            while (data != -1) {
-                char current = (char) data;
-                sb.append(current);
-                data = isw.read();
-            }
-            Log.d("TEST-ARR",sb.toString());
-
+            printout.close();
         } catch (ProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if(printout!=null) try {
-                printout.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             if(urlConnection !=null)urlConnection.disconnect();
         }
-        return sb.toString();
     }
 
-    public String put(MyGenericHTTPClient recurso, JSONObject jsonDataObject) {
+    public String put(String recurso, JSONObject jsonDataObject) {
         StringBuilder sb = new StringBuilder();
 
         HttpURLConnection urlConnection = null;
@@ -87,7 +74,7 @@ public class MyGenericHTTPClient {
             urlConnection.setChunkedStreamingMode(0);
             urlConnection.setRequestProperty("Content-Type","application/json");
             urlConnection.setDoOutput(true);
-            urlConnection.setRequestMethod("PUT ");
+            urlConnection.setRequestMethod("PUT");
             urlConnection.setUseCaches(false);
             printout = new DataOutputStream(urlConnection.getOutputStream());
             Log.d("TEST-ARR",jsonDataObject.toString());
@@ -95,18 +82,18 @@ public class MyGenericHTTPClient {
             String str = jsonDataObject.toString();
             byte[] jsonData=str.getBytes("UTF-8");
             printout.write(jsonData);
-//          printout.writeBytes(URLEncoder.encode(pedidoJSON.toString(),"UTF-8"));
+            //printout.writeBytes(URLEncoder.encode(pedidoJSON.toString(),"UTF-8"));
             printout.flush();
 
             // leer las respuestas
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            /*InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             InputStreamReader isw = new InputStreamReader(in);
             int data = isw.read();
             while (data != -1) {
                 char current = (char) data;
                 sb.append(current);
                 data = isw.read();
-            }
+            }*/
             Log.d("TEST-ARR",sb.toString());
 
         } catch (ProtocolException e) {
