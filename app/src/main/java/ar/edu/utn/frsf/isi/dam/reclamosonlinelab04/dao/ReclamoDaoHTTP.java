@@ -1,11 +1,15 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao;
 
+import android.os.StrictMode;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,6 +80,7 @@ public class ReclamoDaoHTTP implements ReclamoDao {
         String reclamosJSON = cliente.getAll("reclamo");
         try {
             JSONArray arr = new JSONArray(reclamosJSON);
+            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
             for(int i=0;i<arr.length();i++){
                 JSONObject unaFila = arr.getJSONObject(i);
                 Reclamo recTmp = new Reclamo();
@@ -83,12 +88,18 @@ public class ReclamoDaoHTTP implements ReclamoDao {
                 recTmp.setTitulo(unaFila.getString("titulo"));
                 recTmp.setTipo(this.getTipoReclamoById(unaFila.getInt("tipoId")));
                 recTmp.setEstado(this.getEstadoById(unaFila.getInt("estadoId")));
+                if(!unaFila.getString("fecha").equals("")){
+                    recTmp.setFecha(formatoFecha.parse(unaFila.getString("fecha")));
+                }
                 if(unaFila.has("lan") && unaFila.has("lon")){
                     recTmp.setLugar(new LatLng(unaFila.getInt("lat"), unaFila.getInt("lon")));
                 }
                 listaReclamos.add(recTmp);
             }
         } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        catch (ParseException e) {
             e.printStackTrace();
         }
         return listaReclamos;
@@ -136,26 +147,62 @@ public class ReclamoDaoHTTP implements ReclamoDao {
     public void crear(Reclamo r) throws JSONException {
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", 16);
         jsonObject.put("titulo", r.getTitulo());
         jsonObject.put("detalle", r.getDetalle());
-        jsonObject.put("fecha", "");
-        jsonObject.put("tipoId", 8);
-        jsonObject.put("estadoId", 5);
-
-        cliente.post("reclamo", jsonObject);
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+        jsonObject.put("fecha", formatoFecha.format(r.getFecha()));
+        jsonObject.put("tipoId", r.getTipo().getId());
+        jsonObject.put("estadoId", r.getEstado().getId());
 
         System.out.print(jsonObject.toString());
 
-    }
+        cliente.post("reclamo", jsonObject);
+}
+
 
     @Override
-    public void actualizar(Reclamo r) {
+    public void actualizar(Reclamo r) throws JSONException {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+      /*  String reclamosJSON = cliente.getAll("reclamo");
+        try {
+            JSONArray arr = new JSONArray(reclamosJSON);
+            for(int i=0;i<arr.length();i++){
+                JSONObject unaFila = arr.getJSONObject(i);
+                    if(unaFila.getInt("id") ==r.getId()){ // compare for the key-value
+                        ((JSONObject)arr.get(i)).put("id", 25); // put the new value for the key
+                    }
+           }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }*/
+
+
+        String rec= cliente.getById("reclamo", r.getId());
+        try{
+            JSONObject jsonObject = new JSONObject();
+            //jsonObject.put("id", r.getId());
+            jsonObject.put("titulo", r.getTitulo());
+            jsonObject.put("detalle", r.getDetalle());
+            SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+            jsonObject.put("fecha", formatoFecha.format(r.getFecha()));
+            jsonObject.put("tipoId", r.getTipo().getId());
+            jsonObject.put("estadoId", r.getEstado().getId());
+
+            cliente.put("reclamo", jsonObject, r.getId());
+
+        }catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
+
 
     @Override
-    public void borrar(Reclamo r) {
-
+    public void borrar(Reclamo r)  {
+        //verificar cual es el reclamo a borrar
+        cliente.delete("reclamo",r.getId());
     }
+
 }

@@ -20,6 +20,6 @@ public interface ReclamoDao {
     public TipoReclamo getTipoReclamoById(Integer id);
 
     public void crear(Reclamo r) throws JSONException;
-    public void actualizar(Reclamo r);
+    public void actualizar(Reclamo r) throws JSONException;
     public void borrar(Reclamo r);
     }

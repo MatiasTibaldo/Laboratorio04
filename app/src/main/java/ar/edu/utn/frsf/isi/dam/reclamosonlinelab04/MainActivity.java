@@ -2,10 +2,12 @@ package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
                 listaReclamos.addAll(rec);
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        listViewReclamos.invalidateViews();
                         adapter.notifyDataSetChanged();
                     }
                 });
@@ -60,10 +63,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivity.this, FormReclamo.class);
+                i.putExtra("titulo",0);
                 startActivityForResult(i, CREACION_RECLAMO);
             }
         });
+        listViewReclamos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int pos, long id) {
+                // TODO Auto-generated method stub
+
+                Log.v("long clicked","pos: " + pos);
+                Reclamo r = (Reclamo) listViewReclamos.getItemAtPosition(pos);
+                Intent i = new Intent(MainActivity.this, FormReclamo.class);
+                i.putExtra("titulo",r.getTitulo());
+                i.putExtra("detalle",r.getDetalle());
+                i.putExtra("lugar", r.getLugar());
+                i.putExtra("id",r.getId());
+                startActivityForResult(i, CREACION_RECLAMO);
+
+                return true;
+            }
+        });
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){

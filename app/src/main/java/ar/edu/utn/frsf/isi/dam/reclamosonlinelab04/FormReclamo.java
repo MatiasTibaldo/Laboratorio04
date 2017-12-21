@@ -21,10 +21,12 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao.ReclamoDao;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.dao.ReclamoDaoHTTP;
+import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.Estado;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.Reclamo;
 import ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo.TipoReclamo;
 
@@ -51,11 +53,12 @@ public class FormReclamo extends AppCompatActivity {
     private List<TipoReclamo> listaTiposReclamos;
     private ImageView mImageView;
     private MediaRecorder mRecorder;
-    private String mFileName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
         daoReclamo = new ReclamoDaoHTTP();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_form_reclamo);
@@ -63,10 +66,21 @@ public class FormReclamo extends AppCompatActivity {
         listaTiposReclamos = new ArrayList<>();
 
         rec = new Reclamo();
-
         etTitulo = (EditText)findViewById(R.id.frmReclamoTextReclamo);
         etDetalle = (EditText)findViewById(R.id.frmReclamoTextDetReclamo);
         etLugar = (EditText)findViewById(R.id.frmReclamoTextLugar);
+        if(getIntent().getExtras().getString("titulo")== null){ //para saber si es una reclamo existente o uno nuevo
+
+            //btnEliminar.setEnabled(false);
+            //no debria estar disponible el button eliminar
+
+        }
+        else{
+            etTitulo.setText(getIntent().getExtras().getString("titulo"));
+            etDetalle.setText(getIntent().getExtras().getString("detalle"));
+            etLugar.setText(getIntent().getExtras().getString("lugar"));
+        }
+
 
         btnSacarFoto = (Button) findViewById(R.id.frmReclamoSacarFoto);
         btnGrabarAudio = (Button) findViewById(R.id.frmReclamoRecAudio);
@@ -106,9 +120,19 @@ public class FormReclamo extends AppCompatActivity {
                 rec.setTitulo(etTitulo.getText().toString());
                 rec.setDetalle(etDetalle.getText().toString());
                 rec.setTipo((TipoReclamo)spTipoReclamo.getItemAtPosition(spTipoReclamo.getSelectedItemPosition()));
-
+                rec.setFecha(new Date());
+                Estado estado = new Estado();
+                estado.setId(1);//1=enviado
+                estado.setTipo("Enviado");
+                rec.setEstado(estado);
                 try {
-                    daoReclamo.crear(rec);
+                    if(getIntent().getExtras().getString("titulo")== null){// es un reclamo nuevo
+                        daoReclamo.crear(rec);
+                    }
+                    else{
+                        rec.setId(getIntent().getExtras().getInt("id"));
+                        daoReclamo.actualizar(rec);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -118,6 +142,20 @@ public class FormReclamo extends AppCompatActivity {
             }
         });
         btnEliminar = (Button)findViewById(R.id.frmReclamoEliminar);
+
+        btnEliminar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rec.setId(getIntent().getExtras().getInt("id"));
+                rec.setTitulo(etTitulo.getText().toString());
+                rec.setDetalle(etDetalle.getText().toString());
+                rec.setTipo((TipoReclamo)spTipoReclamo.getItemAtPosition(spTipoReclamo.getSelectedItemPosition()));
+                daoReclamo.borrar(rec);
+                Intent i = new Intent();
+                setResult(Activity.RESULT_OK, i);
+                finish();
+            }
+        });
         btnCancelar = (Button)findViewById(R.id.frmReclamoCancelar);
         btnCancelar.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -51,7 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("lala").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
         float zoon =10;
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney,zoon));
-
+        uiSettings.setScrollGesturesEnabled(true);
         actualizarMapa();
 
     }
@@ -83,6 +83,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(SYDNEY, 15));
         mMap.animateCamera(CameraUpdateFactory.zoomIn());
         mMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+
+
     }
 }
 

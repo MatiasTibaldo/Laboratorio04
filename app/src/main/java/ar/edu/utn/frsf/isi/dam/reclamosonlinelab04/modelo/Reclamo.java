@@ -1,9 +1,6 @@
 package ar.edu.utn.frsf.isi.dam.reclamosonlinelab04.modelo;
 
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
@@ -29,12 +26,12 @@ public class Reclamo{
     }
 
     public Reclamo(Integer id, String titulo, String detalle, Date fecha, TipoReclamo tipo, Estado estado) {
-        this.id = id;
-        this.titulo = titulo;
-        this.detalle = detalle;
-        this.fecha = fecha;
-        this.tipo = tipo;
-        this.estado = estado;
+        this.setId(id);
+        this.setTitulo(titulo);
+        this.setDetalle(detalle);
+        this.setFecha(fecha);
+        this.setTipo(tipo);
+        this.setEstado(estado);
     }
 
     public Integer getId() {
